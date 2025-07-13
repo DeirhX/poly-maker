@@ -8,7 +8,7 @@ from py_clob_client.constants import POLYGON
 
 # Web3 libraries for blockchain interaction
 from web3 import Web3
-from web3.middleware import geth_poa_middleware
+from web3.middleware.geth_poa import geth_poa_middleware
 from eth_account import Account
 
 import requests                     # HTTP requests
@@ -48,13 +48,24 @@ class PolymarketClient:
         host="https://clob.polymarket.com"
 
         # Get credentials from environment variables
-        key=os.getenv("PK")
-        browser_address = os.getenv("BROWSER_ADDRESS")
+        key=os.getenv("POLY_PK")
+        browser_address = os.getenv("POLY_ADDRESS")
+        
+        # Validate that required environment variables are set
+        if not key:
+            raise ValueError("POLY_PK environment variable is required")
+        if not browser_address:
+            raise ValueError("POLY_ADDRESS environment variable is required")
 
         # Don't print sensitive wallet information
         print("Initializing Polymarket client...")
         chain_id=POLYGON
-        self.browser_wallet=Web3.toChecksumAddress(browser_address)
+        
+        # Initialize Web3 connection to Polygon first
+        web3 = Web3(Web3.HTTPProvider("https://polygon-rpc.com"))
+        web3.middleware_onion.inject(geth_poa_middleware, layer=0)
+        
+        self.browser_wallet=web3.to_checksum_address(browser_address)
 
         # Initialize the Polymarket API client
         self.client = ClobClient(
@@ -69,13 +80,9 @@ class PolymarketClient:
         self.creds = self.client.create_or_derive_api_creds()
         self.client.set_api_creds(creds=self.creds)
         
-        # Initialize Web3 connection to Polygon
-        web3 = Web3(Web3.HTTPProvider("https://polygon-rpc.com"))
-        web3.middleware_onion.inject(geth_poa_middleware, layer=0)
-        
         # Set up USDC contract for balance checks
         self.usdc_contract = web3.eth.contract(
-            address="0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", 
+            address=web3.to_checksum_address("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"), 
             abi=erc20_abi
         )
 
@@ -88,12 +95,12 @@ class PolymarketClient:
 
         # Initialize contract interfaces
         self.neg_risk_adapter = web3.eth.contract(
-            address=self.addresses['neg_risk_adapter'], 
+            address=web3.to_checksum_address(self.addresses['neg_risk_adapter']), 
             abi=NegRiskAdapterABI
         )
 
         self.conditional_tokens = web3.eth.contract(
-            address=self.addresses['conditional_tokens'], 
+            address=web3.to_checksum_address(self.addresses['conditional_tokens']), 
             abi=ConditionalTokenABI
         )
 

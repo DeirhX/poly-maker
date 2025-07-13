@@ -27,7 +27,7 @@ require('dotenv').config({ path: envPath })
 
 // Connect to Polygon network
 const provider = new ethers.providers.JsonRpcProvider("https://polygon-rpc.com");
-const privateKey = process.env.PK;
+const privateKey = process.env.POLY_PK;
 const wallet = new ethers.Wallet(privateKey, provider);
 
 // Polymarket contract addresses
@@ -97,7 +97,7 @@ async function mergePositions(amountToMerge, conditionId, isNegRiskMarket) {
     };
 
     // Get the Safe address from environment variables
-    const safeAddress = process.env.BROWSER_ADDRESS;
+    const safeAddress = process.env.POLY_ADDRESS;
     const safe = new ethers.Contract(safeAddress, safeAbi, wallet);
 
     // Execute the transaction through the Safe

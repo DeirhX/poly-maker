@@ -55,8 +55,8 @@ cp .env.example .env
 ```
 
 5. **Configure your credentials in `.env`**:
-- `PK`: Your private key for Polymarket
-- `BROWSER_ADDRESS`: Your wallet address
+- `POLY_PK`: Your private key for Polymarket
+- `POLY_ADDRESS`: Your wallet address
 
 Make sure your wallet has done at least one trade thru the UI so that the permissions are proper.
 

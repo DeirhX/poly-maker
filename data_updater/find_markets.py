@@ -4,7 +4,47 @@ import os
 import requests
 import time
 import warnings
+import threading
+import concurrent.futures
+from collections import deque
 warnings.filterwarnings("ignore")
+
+
+class RateLimiter:
+    """
+    Rate limiter using sliding window approach.
+    Ensures no more than max_requests per second.
+    """
+    def __init__(self, max_requests=3, window_size=1.0):
+        self.max_requests = max_requests
+        self.window_size = window_size
+        self.requests = deque()
+        self.lock = threading.Lock()
+    
+    def acquire(self):
+        """
+        Acquire permission to make a request.
+        This method will block until permission is granted.
+        """
+        with self.lock:
+            current_time = time.time()
+            
+            # Remove old requests outside the window
+            while self.requests and self.requests[0] <= current_time - self.window_size:
+                self.requests.popleft()
+            
+            # If we're at the limit, wait until we can make another request
+            if len(self.requests) >= self.max_requests:
+                sleep_time = self.requests[0] + self.window_size - current_time
+                if sleep_time > 0:
+                    time.sleep(sleep_time)
+                    # Recheck and clean up after sleeping
+                    current_time = time.time()
+                    while self.requests and self.requests[0] <= current_time - self.window_size:
+                        self.requests.popleft()
+            
+            # Record this request
+            self.requests.append(current_time)
 
 
 if not os.path.exists('data'):
@@ -216,12 +256,17 @@ def process_single_row(row, client):
     return ret
 
 
-def get_all_results(all_df, client, max_workers=5):
+def get_all_results(all_df, client, max_workers=5, requests_per_second=3):
     all_results = []
+    
+    # Create rate limiter instance
+    rate_limiter = RateLimiter(max_requests=requests_per_second, window_size=1.0)
 
     def process_with_progress(args):
         idx, row = args
         try:
+            # Acquire permission before making request
+            rate_limiter.acquire()
             return process_single_row(row, client)
         except:
             print("error fetching market")
@@ -236,7 +281,7 @@ def get_all_results(all_df, client, max_workers=5):
                 all_results.append(result)
 
             if len(all_results) % (max_workers * 2) == 0:
-                print(f'{len(all_results)} of {len(all_df)}')
+                print(f'{len(all_results)} of {len(all_df)} (rate limited to {requests_per_second} req/sec)')
 
     return all_results
 
@@ -290,14 +335,19 @@ def add_volatility(row):
     new_dict = {**row_dict, **stats}
     return new_dict
 
-def add_volatility_to_df(df, max_workers=3):
+def add_volatility_to_df(df, max_workers=3, requests_per_second=3):
     
     results = []
     df = df.reset_index(drop=True)
+    
+    # Create rate limiter instance for volatility requests
+    rate_limiter = RateLimiter(max_requests=requests_per_second, window_size=1.0)
 
     def process_volatility_with_progress(args):
         idx, row = args
         try:
+            # Acquire permission before making request
+            rate_limiter.acquire()
             ret = add_volatility(row.to_dict())
             return ret
         except:
@@ -313,7 +363,7 @@ def add_volatility_to_df(df, max_workers=3):
                 results.append(result)
                 
             if len(results) % (max_workers * 2) == 0:
-                print(f'{len(results)} of {len(df)}')
+                print(f'{len(results)} of {len(df)} (rate limited to {requests_per_second} req/sec)')
             
     return pd.DataFrame(results)
 

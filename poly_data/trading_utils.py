@@ -188,7 +188,7 @@ def get_buy_sell_amount(position, bid_price, row, other_token_position=0):
 
     # Apply multiplier for low-priced assets
     if bid_price < 0.1 and buy_amount > 0:
-        if row['multiplier'] != '':
+        if 'multiplier' in row and row['multiplier'] != '':
             print(f"Multiplying buy amount by {int(row['multiplier'])}")
             buy_amount = buy_amount * int(row['multiplier'])
 

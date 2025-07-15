@@ -60,6 +60,7 @@ def send_buy_order(order):
     # Don't place orders that are below incentive threshold
     if order['price'] < incentive_start:
         trade = False
+        print("Trade incentive not met")
 
     if trade:
         # Only place orders with prices between 0.1 and 0.9 to avoid extreme positions
@@ -461,6 +462,8 @@ async def perform_trade(market):
                     # elif best_ask_size < orders['sell']['size'] * 0.98 and abs(best_ask - second_best_ask) > 0.03...:
                     #     print(f"Cancelling sell orders because best size is less than 90% of open orders...")
                     #     send_sell_order(order)
+                else:
+                    print("No buy or sell")
 
         except Exception as ex:
             print(f"Error performing trade for {market}: {ex}")

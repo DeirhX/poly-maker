@@ -70,14 +70,7 @@ class PolymarketClient:
         web3 = Web3(Web3.HTTPProvider("https://polygon-rpc.com"))
         web3.middleware_onion.inject(geth_poa_middleware, layer=0)
         
-        if signature_type == 2:
-            self.browser_wallet=web3.to_checksum_address(browser_address)
-        elif signature_type == 1:
-            self.browser_wallet=os.getenv("SAFE_PROXY")
-            if not self.browser_wallet:
-                raise ValueError("SAFE_PROXY env var is required when SIGNATURE_TYPE=1")
-        else:
-            raise ValueError("SIGNATURE_TYPE must be 1 or 2")
+        self.browser_wallet=web3.to_checksum_address(browser_address)
 
         # Initialize the Polymarket API client
         self.client = ClobClient(

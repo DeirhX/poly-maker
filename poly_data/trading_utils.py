@@ -191,6 +191,6 @@ def get_buy_sell_amount(position, bid_price, row, other_token_position=0):
         if 'multiplier' in row and row['multiplier'] != '':
             print(f"Multiplying buy amount by {int(row['multiplier'])}")
             buy_amount = buy_amount * int(row['multiplier'])
-
+            
     return buy_amount, sell_amount
 

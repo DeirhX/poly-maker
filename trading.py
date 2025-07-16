@@ -60,7 +60,6 @@ def send_buy_order(order):
     # Don't place orders that are below incentive threshold
     if order['price'] < incentive_start:
         trade = False
-        print("Trade incentive not met")
 
     if trade:
         # Only place orders with prices between 0.1 and 0.9 to avoid extreme positions
@@ -352,7 +351,8 @@ async def perform_trade(market):
                 # 1. Position is less than max_size (new logic)
                 # 2. Position is less than absolute cap (250)
                 # 3. Buy amount is above minimum size
-                if position < max_size and position < 250 and buy_amount > 0 and buy_amount >= row['min_size']:
+                print(row['min_size'])
+                if position < max_size and position < 250 and buy_amount > 0 and buy_amount >= 1:
                     # Get reference price from market data
                     sheet_value = row['best_bid']
 

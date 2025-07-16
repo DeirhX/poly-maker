@@ -50,12 +50,17 @@ class PolymarketClient:
         # Get credentials from environment variables
         key=os.getenv("POLY_PK")
         browser_address = os.getenv("POLY_ADDRESS")
+        raw_sig = os.getenv("SIGNATURE_TYPE")
         
         # Validate that required environment variables are set
         if not key:
             raise ValueError("POLY_PK environment variable is required")
         if not browser_address:
             raise ValueError("POLY_ADDRESS environment variable is required")
+        if not raw_sig:
+            raise ValueError("SIGNATURE_TYPE variable is required")
+        
+        signature_type = int(raw_sig)
 
         # Don't print sensitive wallet information
         print("Initializing Polymarket client...")
@@ -65,7 +70,14 @@ class PolymarketClient:
         web3 = Web3(Web3.HTTPProvider("https://polygon-rpc.com"))
         web3.middleware_onion.inject(geth_poa_middleware, layer=0)
         
-        self.browser_wallet=web3.to_checksum_address(browser_address)
+        if signature_type == 2:
+            self.browser_wallet=web3.to_checksum_address(browser_address)
+        elif signature_type == 1:
+            self.browser_wallet=os.getenv("SAFE_PROXY")
+            if not self.browser_wallet:
+                raise ValueError("SAFE_PROXY env var is required when SIGNATURE_TYPE=1")
+        else:
+            raise ValueError("SIGNATURE_TYPE must be 1 or 2")
 
         # Initialize the Polymarket API client
         self.client = ClobClient(
@@ -73,7 +85,7 @@ class PolymarketClient:
             key=key,
             chain_id=chain_id,
             funder=self.browser_wallet,
-            signature_type=2
+            signature_type=signature_type
         )
 
         # Set up API credentials

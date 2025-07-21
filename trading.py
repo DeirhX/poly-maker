@@ -297,8 +297,8 @@ async def perform_trade(market):
                     n_deets = get_best_bid_ask_deets(market, detail['name'], 100, 0.1)
                     
                     # Calculate current market price and spread
-                    mid_price = round_up((n_deets['best_bid'] + n_deets['best_ask']) / 2, round_length)
-                    spread = round(n_deets['best_ask'] - n_deets['best_bid'], 2)
+                    # mid_price = round_up((n_deets['best_bid'] + n_deets['best_ask']) / 2, round_length)
+                    # spread = round(n_deets['best_ask'] - n_deets['best_bid'], 2)
 
                     # Calculate current profit/loss on position
                     pnl = (mid_price - avgPrice) / avgPrice * 100
@@ -353,7 +353,8 @@ async def perform_trade(market):
                 # 3. Buy amount is above minimum size
                 print(row['min_size'])
                 # Only trade if spread >= 10 for now
-                if position < max_size and position < 250 and buy_amount > 0 and spread >= 10:
+                spread = top_ask - top_bid
+                if position < max_size and position < 250 and buy_amount > 0 and spread >= 0.1:
                     # Get reference price from market data
                     sheet_value = row['best_bid']
 

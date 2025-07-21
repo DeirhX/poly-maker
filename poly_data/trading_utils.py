@@ -3,6 +3,7 @@ from poly_data.data_utils import update_positions
 import poly_data.global_state as global_state
 
 # def get_avgPrice(position, assetId):
+#     """Get the average price for a given position and asset."""
 #     curr_global = global_state.all_positions[global_state.all_positions['asset'] == str(assetId)]
 #     api_position_size = 0
 #     api_avgPrice = 0
@@ -26,6 +27,7 @@ import poly_data.global_state as global_state
 #     return api_avgPrice
 
 def get_best_bid_ask_deets(market, name, size, deviation_threshold=0.05):
+    """Return best bid/ask details and size information for a market."""
 
     best_bid, best_bid_size, second_best_bid, second_best_bid_size, top_bid = find_best_price_with_size(global_state.all_data[market]['bids'], size, reverse=True)
     best_ask, best_ask_size, second_best_ask, second_best_ask_size, top_ask = find_best_price_with_size(global_state.all_data[market]['asks'], size, reverse=False)
@@ -81,6 +83,7 @@ def get_best_bid_ask_deets(market, name, size, deviation_threshold=0.05):
 
 
 def find_best_price_with_size(price_dict, min_size, reverse=False):
+    """Find the best and second-best price with sufficient size from a price dictionary."""
     lst = list(price_dict.items())
 
     if reverse:
@@ -107,17 +110,19 @@ def find_best_price_with_size(price_dict, min_size, reverse=False):
     return best_price, best_size, second_best_price, second_best_size, top_price
 
 def get_order_prices(best_bid, best_bid_size, top_bid,  best_ask, best_ask_size, top_ask, avgPrice, row):
-
+    """Calculate bid and ask prices for quoting orders."""
+    # Quote by undercutting the current price by 1 tick
     bid_price = best_bid + row['tick_size']
     ask_price = best_ask - row['tick_size']
 
+    # If the current best price had a small size, instead quote that
     if best_bid_size < row['min_size'] * 1.5:
         bid_price = best_bid
     
-    if best_ask_size < 250 * 1.5:
+    if best_ask_size < row['min_size'] * 1.5:
         ask_price = best_ask
     
-
+    # Make sure we don't cross the spread with our quotes
     if bid_price >= top_ask:
         bid_price = top_bid
 
@@ -133,8 +138,8 @@ def get_order_prices(best_bid, best_bid_size, top_bid,  best_ask, best_ask_size,
     #         ask_price = avgPrice
 
     #temp for sleep
-    if ask_price <= avgPrice and avgPrice > 0:
-        ask_price = avgPrice
+    #if ask_price <= avgPrice and avgPrice > 0:
+    #    ask_price = avgPrice
 
     return bid_price, ask_price
 
@@ -142,14 +147,17 @@ def get_order_prices(best_bid, best_bid_size, top_bid,  best_ask, best_ask_size,
 
 
 def round_down(number, decimals):
+    """Round a number down to a given number of decimals."""
     factor = 10 ** decimals
     return math.floor(number * factor) / factor
 
 def round_up(number, decimals):
+    """Round a number up to a given number of decimals."""
     factor = 10 ** decimals
     return math.ceil(number * factor) / factor
 
 def get_buy_sell_amount(position, bid_price, row, other_token_position=0):
+    """Determine buy and sell amounts based on position and market conditions."""
     buy_amount = 0
     sell_amount = 0
 

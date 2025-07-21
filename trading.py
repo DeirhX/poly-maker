@@ -322,26 +322,26 @@ async def perform_trade(market):
                     # Trigger stop-loss if either:
                     # 1. PnL is below threshold and spread is tight enough to exit
                     # 2. Volatility is too high
-                    if (pnl < params['stop_loss_threshold'] and spread <= params['spread_threshold']) or row['3_hour'] > params['volatility_threshold']:
-                        risk_details['msg'] = (f"Selling {pos_to_sell} because spread is {spread} and pnl is {pnl} "
-                                              f"and ratio is {ratio} and 3 hour volatility is {row['3_hour']}")
-                        print("Stop loss Triggered: ", risk_details['msg'])
+                    # if (pnl < params['stop_loss_threshold'] and spread <= params['spread_threshold']) or row['3_hour'] > params['volatility_threshold']:
+                    #     risk_details['msg'] = (f"Selling {pos_to_sell} because spread is {spread} and pnl is {pnl} "
+                    #                           f"and ratio is {ratio} and 3 hour volatility is {row['3_hour']}")
+                    #     print("Stop loss Triggered: ", risk_details['msg'])
 
-                        # Sell at market best bid to ensure execution
-                        order['size'] = pos_to_sell
-                        order['price'] = n_deets['best_bid']
+                    #     # Sell at market best bid to ensure execution
+                    #     order['size'] = pos_to_sell
+                    #     order['price'] = n_deets['best_bid']
 
-                        # Set period to avoid trading after stop-loss
-                        risk_details['sleep_till'] = str(pd.Timestamp.utcnow().tz_localize(None) + 
-                                                        pd.Timedelta(hours=params['sleep_period']))
+                    #     # Set period to avoid trading after stop-loss
+                    #     risk_details['sleep_till'] = str(pd.Timestamp.utcnow().tz_localize(None) + 
+                    #                                     pd.Timedelta(hours=params['sleep_period']))
 
-                        print("Risking off")
-                        send_sell_order(order)
-                        client.cancel_all_market(market)
+                    #     print("Risking off")
+                    #     send_sell_order(order)
+                    #     client.cancel_all_market(market)
 
-                        # Save risk details to file
-                        open(fname, 'w').write(json.dumps(risk_details))
-                        continue
+                    #     # Save risk details to file
+                    #     open(fname, 'w').write(json.dumps(risk_details))
+                    #     continue
 
                 # ------- BUY ORDER LOGIC -------
                 # Get max_size, defaulting to trade_size if not specified

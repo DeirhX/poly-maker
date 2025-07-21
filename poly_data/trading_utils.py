@@ -83,7 +83,8 @@ def get_best_bid_ask_deets(market, name, size, deviation_threshold=0.05):
 
 
 def find_best_price_with_size(price_dict, min_size, reverse=False):
-    """Find the best and second-best price with sufficient size from a price dictionary."""
+    """Find the best and second-best price with sufficient size from a price dictionary.
+    """
     lst = list(price_dict.items())
 
     if reverse:
@@ -101,11 +102,11 @@ def find_best_price_with_size(price_dict, min_size, reverse=False):
         if set_best:
             second_best_price, second_best_size = price, size
             break
-
-        if size > min_size:
-            if best_price is None:
-                best_price, best_size = price, size
-                set_best = True
+        
+        # For now, we are considering top_price to be the best price
+        # if size > min_size:
+        best_price, best_size = price, size
+        set_best = True
 
     return best_price, best_size, second_best_price, second_best_size, top_price
 
@@ -116,10 +117,10 @@ def get_order_prices(best_bid, best_bid_size, top_bid,  best_ask, best_ask_size,
     ask_price = best_ask - row['tick_size']
 
     # If the current best price had a small size, instead quote that
-    if best_bid_size < row['min_size'] * 1.5:
+    if best_bid_size < 5:
         bid_price = best_bid
     
-    if best_ask_size < row['min_size'] * 1.5:
+    if best_ask_size < 5:
         ask_price = best_ask
     
     # Make sure we don't cross the spread with our quotes

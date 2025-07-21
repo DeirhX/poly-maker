@@ -351,9 +351,8 @@ async def perform_trade(market):
                 # 1. Position is less than max_size (new logic)
                 # 2. Position is less than absolute cap (250)
                 # 3. Buy amount is above minimum size
-                print(row['min_size'])
                 # Only trade if spread >= 10 for now
-                spread = top_ask - top_bid
+                spread = abs(top_ask - top_bid)
                 if position < max_size and position < 250 and buy_amount > 0 and spread >= 0.1:
                     # Get reference price from market data
                     sheet_value = row['best_bid']
@@ -466,6 +465,7 @@ async def perform_trade(market):
                     #     send_sell_order(order)
                 else:
                     print("No buy or sell")
+                    print(f"Spread is {spread})
 
         except Exception as ex:
             print(f"Error performing trade for {market}: {ex}")

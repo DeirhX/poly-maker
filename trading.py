@@ -352,7 +352,7 @@ async def perform_trade(market):
                 # 2. Position is less than absolute cap (250)
                 # 3. Buy amount is above minimum size
                 print(row['min_size'])
-                if position < max_size and position < 250 and buy_amount >= 1:
+                if position < max_size and position < 250 and buy_amount > 0:
                     # Get reference price from market data
                     sheet_value = row['best_bid']
 

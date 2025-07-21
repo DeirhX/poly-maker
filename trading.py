@@ -430,30 +430,30 @@ async def perform_trade(market):
                                 #     global_state.client.cancel_all_asset(order['token'])
                         
                 # ------- TAKE PROFIT / SELL ORDER MANAGEMENT -------            
-                elif sell_amount > 0:
-                    order['size'] = sell_amount
+                # elif sell_amount > 0:
+                #     order['size'] = sell_amount
                     
-                    # Calculate take-profit price based on average cost
-                    tp_price = round_up(avgPrice + (avgPrice * params['take_profit_threshold']/100), round_length)
-                    order['price'] = round_up(tp_price if ask_price < tp_price else ask_price, round_length)
+                #     # Calculate take-profit price based on average cost
+                #     tp_price = round_up(avgPrice + (avgPrice * params['take_profit_threshold']/100), round_length)
+                #     order['price'] = round_up(tp_price if ask_price < tp_price else ask_price, round_length)
                     
-                    tp_price = float(tp_price)
-                    order_price = float(orders['sell']['price'])
+                #     tp_price = float(tp_price)
+                #     order_price = float(orders['sell']['price'])
                     
-                    # Calculate % difference between current order and ideal price
-                    diff = abs(order_price - tp_price)/tp_price * 100
+                #     # Calculate % difference between current order and ideal price
+                #     diff = abs(order_price - tp_price)/tp_price * 100
 
-                    # Update sell order if:
-                    # 1. Current order price is significantly different from target
-                    if diff > 2:
-                        print(f"Sending Sell Order for {token} because better current order price of "
-                              f"{order_price} is deviant from the tp_price of {tp_price} and diff is {diff}")
-                        send_sell_order(order)
-                    # 2. Current order size is too small for our position
-                    elif orders['sell']['size'] < position * 0.97:
-                        print(f"Sending Sell Order for {token} because not enough sell size. "
-                              f"Position: {position}, Sell Size: {orders['sell']['size']}")
-                        send_sell_order(order)
+                #     # Update sell order if:
+                #     # 1. Current order price is significantly different from target
+                #     if diff > 2:
+                #         print(f"Sending Sell Order for {token} because better current order price of "
+                #               f"{order_price} is deviant from the tp_price of {tp_price} and diff is {diff}")
+                #         send_sell_order(order)
+                #     # 2. Current order size is too small for our position
+                #     elif orders['sell']['size'] < position * 0.97:
+                #         print(f"Sending Sell Order for {token} because not enough sell size. "
+                #               f"Position: {position}, Sell Size: {orders['sell']['size']}")
+                #         send_sell_order(order)
                     
                     # Commented out additional conditions for updating sell orders
                     # elif orders['sell']['price'] < ask_price:

@@ -465,7 +465,7 @@ async def perform_trade(market):
                     #     send_sell_order(order)
                 else:
                     print("No buy or sell")
-                    print(f"Spread is {spread})
+                    print(f"Spread is {spread}")
 
         except Exception as ex:
             print(f"Error performing trade for {market}: {ex}")

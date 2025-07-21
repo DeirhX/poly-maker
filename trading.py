@@ -52,31 +52,31 @@ def send_buy_order(order):
         print(f"Keeping existing buy orders - minor changes: price diff: {price_diff:.4f}, size diff: {size_diff:.1f}")
         return  # Don't place new order if existing one is fine
 
-    # Calculate minimum acceptable price based on market spread
-    incentive_start = order['mid_price'] - order['max_spread']/100
+    # # Calculate minimum acceptable price based on market spread
+    # incentive_start = order['mid_price'] - order['max_spread']/100
 
-    trade = True
+    # trade = True
 
-    # Don't place orders that are below incentive threshold
-    if order['price'] < incentive_start:
-        trade = False
+    # # Don't place orders that are below incentive threshold
+    # if order['price'] < incentive_start:
+    #     trade = False
 
-    if trade:
+    # if trade:
         # Only place orders with prices between 0.1 and 0.9 to avoid extreme positions
-        if order['price'] >= 0.1 and order['price'] < 0.9:
-            print(f'Creating new order for {order["size"]} at {order["price"]}')
-            print(order['token'], 'BUY', order['price'], order['size'])
-            client.create_order(
+            # if order['price'] >= 0.1 and order['price'] < 0.9:
+    print(f'Creating new order for {order["size"]} at {order["price"]}')
+    print(order['token'], 'BUY', order['price'], order['size'])
+    client.create_order(
                 order['token'], 
                 'BUY', 
                 order['price'], 
                 order['size'], 
                 True if order['neg_risk'] == 'TRUE' else False
             )
-        else:
-            print("Not creating buy order because its outside acceptable price range (0.1-0.9)")
-    else:
-        print(f'Not creating new order because order price of {order["price"]} is less than incentive start price of {incentive_start}. Mid price is {order["mid_price"]}')
+        # else:
+            # print("Not creating buy order because its outside acceptable price range (0.1-0.9)")
+    # else:
+    #     print(f'Not creating new order because order price of {order["price"]} is less than incentive start price of {incentive_start}. Mid price is {order["mid_price"]}')
 
 
 def send_sell_order(order):

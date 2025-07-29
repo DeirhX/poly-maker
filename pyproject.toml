@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "poly_maker"
+version = "0.1.0"
+description = "Polymarket trading and market making utilities"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"},
+]
+dependencies = [
+    # Add dependencies from requirements.txt here
+    "pandas",
+    "numpy",
+    "requests",
+    "web3",
+    "python-dotenv",
+    "gspread",
+    "websockets",
+    "asyncio",
+]
+requires-python = ">=3.8"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "flake8",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["poly_data*", "poly_utils*", "poly_stats*", "poly_merger*", "data_updater*"]
+
+[tool.setuptools.package-data]
+poly_data = ["*.json", "*.txt"] 

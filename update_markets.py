@@ -127,7 +127,7 @@ if __name__ == "__main__":
     while True:
         try:
             fetch_and_process_data()
-            time.sleep(60 * 60)  # Sleep for an hour
+            # time.sleep(60 * 60)  # Sleep for an hour
         except Exception as e:
             traceback.print_exc()
             print(str(e))
